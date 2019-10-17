@@ -20,11 +20,36 @@
 </head>
 <body>
     test
+    <button id='btnAdd'>Add</button>
     <script>
+        
         if('serviceWorker' in navigator){
             window.addEventListener('load',e=>{
                 navigator.serviceWorker.register('./sw.js');
-            });            
+            });
+
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt',e=>{
+                console.log('SW beforeinstallprompt');
+                e.preventDefault();
+                deferredPrompt=e;
+                btnAdd.style.display='block';
+            });
+            window.addEventListener('appinstalled',e=>{
+                console.log('SW App Installed');
+                btnAdd.style.display='none';
+            });
+            
+            btnAdd.addEventListener('click',e=>{
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(x=>{
+                    if(x.outcome=='accepted'){
+                        console.log('app install Accepted');
+                    }
+                    deferredPrompt=null;
+                });
+            });
+                        
         }
     </script>
 </body>
